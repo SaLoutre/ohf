@@ -46,8 +46,8 @@ int main() {
         double j4 = dOmega(theta + k3, omega + j3, t + dt) * dt;
 
         // Mise à jour de theta et omega
-        theta += (k1 + 2*k2 + 2*k3 + k4) / 6;
-        omega += (j1 + 2*j2 + 2*j3 + j4) / 6;
+        theta += (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+        omega += (j1 + 2 * j2 + 2 * j3 + j4) / 6;
         t += dt;
 
         // Écriture dans le fichier

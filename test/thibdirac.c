@@ -5,23 +5,32 @@
 const double lambda = 0.1; // Constante d'amortissement
 const double w0 = 1.0;    // Fréquence naturelle
 const double w = 0.1;     // Fréquence de forçage
+const double diracFrequency = 10000.0; // Fréquence du peigne de Dirac
 
 // Fonction pour calculer la dérivée de theta
 double dTheta(double omega) {
     return omega;
 }
 
-// Fonction pour calculer la dérivée de omega
+// Fonction pour calculer la dérivée de omega avec un peigne de Dirac
 double dOmega(double theta, double omega, double t) {
-    return -2 * lambda * omega - w0 * w0 * theta + sin(w * t);
+    // Utilisation d'un peigne de Dirac avec une fréquence diracFrequency
+    double diracSignal = 0.0;
+
+    // Ajout d'une impulsion de Dirac à chaque intervalle régulier
+    if (fmod(t, 1.0 / diracFrequency) < 1e-10) {
+        diracSignal = 10.0;
+    }
+
+    return -2 * lambda * omega - w0 * w0 * theta + diracSignal;
 }
 
 // Fonction principale
 int main() {
-    FILE *file = fopen("phase.dat", "w"); // Ouvre le fichier en écriture
+    FILE *file = fopen("phasedirac.dat", "w"); // Ouvre le fichier en écriture
 
     if (file == NULL) {
-        fprintf(stderr, "Erreur lors de l'ouverture du fichier phase.dat\n");
+        fprintf(stderr, "Erreur lors de l'ouverture du fichier phasedirac.dat\n");
         return 1; // Quitte le programme avec un code d'erreur
     }
 
@@ -29,8 +38,7 @@ int main() {
     double omega = 2.0; // Condition initiale pour omega
     double t = 0.0;     // Temps initial
     double dt = 0.01;   // Pas de temps
-    int steps = 10000;   // Nombre de pas
-
+    int steps = 20000;   // Nombre de pas
     for (int i = 0; i < steps; i++) {
         // Calcul des k et j pour Runge-Kutta
         double k1 = dTheta(omega) * dt;
@@ -46,8 +54,8 @@ int main() {
         double j4 = dOmega(theta + k3, omega + j3, t + dt) * dt;
 
         // Mise à jour de theta et omega
-        theta += (k1 + 2*k2 + 2*k3 + k4) / 6;
-        omega += (j1 + 2*j2 + 2*j3 + j4) / 6;
+        theta += (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+        omega += (j1 + 2 * j2 + 2 * j3 + j4) / 6;
         t += dt;
 
         // Écriture dans le fichier
