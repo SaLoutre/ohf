@@ -33,13 +33,42 @@ int main() {
         double max_amplitude = 0.0;
 
         // Transient phase - permet au système d'atteindre un état stationnaire
+
         for (int i = 0; i < transient_steps; ++i) {
-            // ... (comme dans votre code existant)
+            double k1 = dTheta(omega) * dt;
+            double j1 = dOmega(theta, omega, w, t) * dt;
+
+            double k2 = dTheta(omega + j1 / 2) * dt;
+            double j2 = dOmega(theta + k1 / 2, omega + j1 / 2, w, t + dt / 2) * dt;
+
+            double k3 = dTheta(omega + j2 / 2) * dt;
+            double j3 = dOmega(theta + k2 / 2, omega + j2 / 2, w, t + dt / 2) * dt;
+
+            double k4 = dTheta(omega + j3) * dt;
+            double j4 = dOmega(theta + k3, omega + j3, w, t + dt) * dt;
+
+            theta += (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+            omega += (j1 + 2 * j2 + 2 * j3 + j4) / 6;
+            t += dt;
         }
 
         // Measurement phase - mesure de l'amplitude et du décalage
         for (int i = 0; i < steps_per_frequency; ++i) {
-            // ... (comme dans votre code existant)
+            double k1 = dTheta(omega) * dt;
+            double j1 = dOmega(theta, omega, w, t) * dt;
+
+            double k2 = dTheta(omega + j1 / 2) * dt;
+            double j2 = dOmega(theta + k1 / 2, omega + j1 / 2, w, t + dt / 2) * dt;
+
+            double k3 = dTheta(omega + j2 / 2) * dt;
+            double j3 = dOmega(theta + k2 / 2, omega + j2 / 2, w, t + dt / 2) * dt;
+
+            double k4 = dTheta(omega + j3) * dt;
+            double j4 = dOmega(theta + k3, omega + j3, w, t + dt) * dt;
+
+            theta += (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+            omega += (j1 + 2 * j2 + 2 * j3 + j4) / 6;
+            t += dt;
 
             if (fabs(theta) > max_amplitude) {
                 max_amplitude = fabs(theta);
